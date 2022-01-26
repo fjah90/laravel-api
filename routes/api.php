@@ -3,7 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\PassportAuthController;
-use App\Http\Controllers\API\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,6 +54,24 @@ Route::prefix('v1')->group(function () {
             Route::post('/unsubscribe/{id}', 'App\Http\Controllers\StudentController@unsubscribe');
             //get enrolling course by Id
             Route::get('/courses/{courseId}', 'App\Http\Controllers\StudentController@courseShowById');
+        });
+    });
+
+    Route::prefix('teacher')->group(function () {
+        Route::middleware(['auth:api'])->group(function () {
+            Route::get('/', 'App\Http\Controllers\UserController@user');
+            //get all enrolling courses
+            // Route::get('/courses', 'App\Http\Controllers\TeacherController@showCourses');
+            //dictate course
+            Route::post('/dictate/{courseId}', 'App\Http\Controllers\TeacherController@dictateCourse');
+            //destroy dictate course
+            Route::delete('/dictate/{courseId}', 'App\Http\Controllers\TeacherController@destroyDictateCourse');
+            //get dictate course by tacher Id
+            Route::get('/courses/{courseId}/{teacherId}/', 'App\Http\Controllers\TeacherController@getCoursesByIdAndTeacherId');
+            //get all dictate courses
+            Route::get('/courses', 'App\Http\Controllers\TeacherController@showCourses');
+            //get dictate course by Id
+            Route::get('/courses/{courseId}', 'App\Http\Controllers\TeacherController@showCoursesByCourseId');
         });
     });
 });
