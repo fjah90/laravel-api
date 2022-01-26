@@ -15,15 +15,32 @@ use App\Http\Controllers\API\ProductController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::prefix('user')->group(function () {
+Route::prefix('v1')->group(function () {
 
-    Route::post('register', 'App\Http\Controllers\UserController@register');
-    Route::post('login', 'App\Http\Controllers\UserController@login');
+    Route::prefix('user')->group(function () {
+        Route::post('register', 'App\Http\Controllers\UserController@register');
+        Route::post('login', 'App\Http\Controllers\UserController@login');
 
-    // passport auth api
-    Route::middleware(['auth:api'])->group(function () {
-        Route::get('/', 'App\Http\Controllers\UserController@user');
-        Route::get('logout', 'App\Http\Controllers\UserController@logout');
+        Route::middleware(['auth:api'])->group(function () {
+            Route::get('/', 'App\Http\Controllers\UserController@user');
+            Route::get('logout', 'App\Http\Controllers\UserController@logout');
+        });
+    });
+
+    Route::prefix('courses')->group(function () {
+
+        Route::get('/', 'App\Http\Controllers\AdminController@showCourses');
+
+        Route::middleware(['auth:api'])->group(function () {
+            //create
+            Route::post('/', 'App\Http\Controllers\AdminController@storeCourse');
+            //show
+            Route::get('/{id}', 'App\Http\Controllers\AdminController@showCourseById');
+            //update
+            Route::put('/{id}', 'App\Http\Controllers\AdminController@updateCourseById');
+            //Delete
+            Route::delete('/{id}', 'App\Http\Controllers\AdminController@destroyCourseById');
+        });
     });
 });
 
