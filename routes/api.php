@@ -42,6 +42,21 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', 'App\Http\Controllers\AdminController@destroyCourseById');
         });
     });
+
+    Route::prefix('student')->group(function () {
+
+        Route::middleware(['auth:api'])->group(function () {
+            Route::get('/', 'App\Http\Controllers\UserController@user');
+            //get all enrolling courses
+            Route::get('/courses', 'App\Http\Controllers\StudentController@coursesShow');
+            //enrolling course
+            Route::post('/enrrolling/{courseId}', 'App\Http\Controllers\StudentController@enrolling');
+            //unsubscribe course
+            Route::post('/unsubscribe/{id}', 'App\Http\Controllers\StudentController@unsubscribe');
+            //get enrolling course by Id
+            Route::get('/courses/{courseId}', 'App\Http\Controllers\StudentController@courseShowById');
+        });
+    });
 });
 
 

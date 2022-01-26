@@ -41,4 +41,11 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    /*
+	 * Relación n:m "enrolling to student in the course"
+	 */
+	public function enrolling()
+	{
+		return $this->belongsToMany('App\Models\Course', 'enrolling_to_students');
+	}
 }
