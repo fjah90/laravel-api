@@ -7,6 +7,7 @@ use Facade\FlareClient\Http\Exceptions\NotFound;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 
 // Models
 use App\Models\Course;
@@ -49,7 +50,34 @@ class AdminController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    public function registerAsAdmin(Request $request) {
+        $userId = Auth::user()->id;
+        $userRole = User::find($userId)->role;
+        if($userRole === 'admin'){
+            $validator = Validator::make($request->all(), [
+                "name" => "required|min:4",
+                "email" => "required|email|unique:users,email",
+                "password" => "required|min:3",
+                "role" => "required|min:4",
+            ]);
 
+            if($validator->fails()) {
+                return $this->validationErrors($validator->errors());
+            }
+
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => $request->role,
+            ]);
+
+            return response()->json(["status" => "success", "error" => false, "message" => "Success! User {$request->role} registered."], 201);
+        }
+            return response()->json(["status" => "success", "error" => false, "message" => "Failed! you are {$userRole} can't registed user."], 201);
+
+
+    }
 	public function storeCourse(Request $request)
 	{
 
@@ -124,5 +152,11 @@ class AdminController extends Controller
         }
         return response()->json(["status" => "failed", "error" => true, "message" => "Failed no found."], 404);
     }
+
+    public function showTeachers()
+	{
+		$teachers = User::where('role', '=', 'teacher')->paginate(5);
+        return response()->json(["status" => "success", "error" => false, "data" => $teachers], 200);
+	}
 
 }

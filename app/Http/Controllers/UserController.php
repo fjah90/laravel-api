@@ -20,7 +20,7 @@ class UserController extends Controller {
      * @param Request $request
      * @return void
      */
-    public function register(Request $request) {
+    public function register(Request $request, $isAdmin = 0) {
 
         $validator = Validator::make($request->all(), [
             "name" => "required|min:4",
@@ -31,14 +31,20 @@ class UserController extends Controller {
         if($validator->fails()) {
             return $this->validationErrors($validator->errors());
         }
-
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
         ]);
 
-        return response()->json(["status" => "success", "error" => false, "message" => "Success! User registered."], 201);
+        if($isAdmin && $request->role){
+            $user = User::find($user->id);
+            $user->update($request->only('role'));
+            return response()->json(["status" => "success", "error" => false, "message" => "Success! User Admin registered."], 201);
+        }else{
+            return response()->json(["status" => "success", "error" => false, "message" => "Success! User registered."], 201);
+        }
+
     }
 
     /**
