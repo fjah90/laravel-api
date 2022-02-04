@@ -17,13 +17,15 @@ use App\Models\User;
 class TeacherController extends Controller
 {
     //
-    public function dictateCourse($courseId)
+    public function dictateCourse($courseId, $teacherId = 0)
 	{
-        $teacherId = Auth::user()->id;
-		$teacher = User::findOrFail($teacherId);
-        $hasTeacher = $this->hasTeacherInCourse($courseId, $teacherId);
-		// $course = Course::findOrFail($courseId);
-        if(!$hasTeacher){
+
+        $teacherId = $teacherId ? $teacherId : Auth::user()->id;
+        $teacher = User::findOrFail($teacherId);
+
+        $hasTeacher =  TeacherController::hasTeacherInCourse($courseId, $teacherId);
+
+        if(!$hasTeacher && $teacherId > 0){
             try {
                 if($teacher->courses()->attach($courseId) === null) {
                     return response()->json(["status" => "success", "error" => false, "message" => "Success attach a teacher."], 200);
